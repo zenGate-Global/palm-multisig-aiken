@@ -1,0 +1,114 @@
+use aiken/transaction.{
+  InlineDatum, Input, Output, OutputReference, ScriptContext, Spend, Transaction,
+  TransactionId,
+}
+use aiken/transaction/credential.{Address, ScriptCredential}
+use aiken/transaction/value.{add, from_lovelace, to_minted_value, zero}
+use palm_multisig/palm_multisig_validator.{palm_multisig_validator}
+use palm_multisig/tests/global_test_variables.{
+  alice_address_hash, bob_address_hash, charlie_address_hash,
+  dummy_token_asset_name, dummy_token_policy_id, multisig_contract_hash,
+  multisig_singleton_name, one_ada, owner_address_hash,
+}
+use palm_multisig/types.{ChangeSignatures, MultisigDatum, MultisigRedeemer}
+use sundae/multisig.{Signature}
+
+// Test for failure case of multisig changing signatures but extra tokens are in recreated output
+test change_signatures_extra_tokens() fail {
+  let existing_threshold_amount = 2
+  let signatures =
+    [
+      Signature(alice_address_hash),
+      Signature(bob_address_hash),
+      Signature(charlie_address_hash),
+    ]
+
+  let new_signatures =
+    [
+      Signature(alice_address_hash),
+      Signature(bob_address_hash),
+      Signature(charlie_address_hash),
+      Signature(owner_address_hash),
+    ]
+
+  let multisig_input_datum =
+    MultisigDatum { signatures, threshold_amount: existing_threshold_amount }
+
+  let multisig_input_datum_casted: Data = multisig_input_datum
+
+  let multisig_input_utxo_details =
+    Output {
+      address: Address {
+        payment_credential: ScriptCredential(multisig_contract_hash),
+        stake_credential: None,
+      },
+      value: from_lovelace(one_ada)
+        |> add(multisig_contract_hash, multisig_singleton_name, 1),
+      datum: InlineDatum(multisig_input_datum_casted),
+      reference_script: None,
+    }
+
+  let multisig_input_output_ref =
+    OutputReference {
+      transaction_id: TransactionId(
+        #"dcb9788326b92481d5bb0e1de8d85ecfec619947880c43d422aa0a672c79dc2c",
+      ),
+      output_index: 1,
+    }
+
+  let multisig_input =
+    Input {
+      output_reference: multisig_input_output_ref,
+      output: multisig_input_utxo_details,
+    }
+
+  let multisig_output_datum =
+    MultisigDatum {
+      signatures: new_signatures,
+      threshold_amount: existing_threshold_amount,
+    }
+
+  let multisig_output_datum_casted: Data = multisig_output_datum
+
+  let multisig_output =
+    Output {
+      address: Address {
+        payment_credential: ScriptCredential(multisig_contract_hash),
+        stake_credential: None,
+      },
+      value: from_lovelace(one_ada)
+        |> add(multisig_contract_hash, multisig_singleton_name, 1)
+        |> add(dummy_token_policy_id, dummy_token_asset_name, 1),
+      datum: InlineDatum(multisig_output_datum_casted),
+      reference_script: None,
+    }
+
+  let context =
+    ScriptContext {
+      purpose: Spend(multisig_input_output_ref),
+      transaction: transaction.placeholder()
+        |> fn(transaction) {
+            Transaction {
+              ..transaction,
+              inputs: [multisig_input],
+              outputs: [multisig_output],
+              extra_signatories: [
+                bob_address_hash,
+                charlie_address_hash,
+                alice_address_hash,
+              ],
+              mint: zero()
+                |> to_minted_value(),
+            }
+          },
+    }
+
+  let redeemer = MultisigRedeemer { action: ChangeSignatures(new_signatures) }
+
+  palm_multisig_validator(
+    multisig_singleton_name,
+    multisig_input_datum,
+    redeemer,
+    context,
+  )
+}
