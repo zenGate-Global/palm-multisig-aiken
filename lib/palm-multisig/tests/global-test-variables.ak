@@ -11,7 +11,7 @@ pub const owner_address_hash =
   #"6e16fbfe620d7560b235e352030d7e44b1ade0e409c4c715a1c801f2"
 
 pub const alice_address_hash =
-  #"279c909f348e533da5808898f87f9a14bb2c3dfbbacccd631d927a3f"
+  #"b2adac15cfdfe5c921a663608c462359de4e9d385bf25fcc50a35103"
 
 pub const bob_address_hash =
   #"8515e61be3c46054c49a23e52ebf7aeb23c4002b5d9260b9cc30045d"
