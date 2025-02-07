@@ -1,3 +1,4 @@
+use aiken/list
 use aiken/transaction.{Output}
 use palm_multisig/types.{
   ChangeSignatures, ChangeThreshold, MultisigDatum, MultisigRedeemer,
@@ -13,7 +14,15 @@ pub fn valid_datum_recreation(
     get_inline_datum(output.datum)
 
   when redeemer.action is {
-    ChangeSignatures -> input_datum.threshold_amount == threshold_amount
+    ChangeSignatures -> {
+      let new_signature_count = list.length(signatures)
+
+      if new_signature_count < input_datum.threshold_amount {
+        fail @"threshold must be updated to a value at least as large as the number of new signatures"
+      } else {
+        input_datum.threshold_amount == threshold_amount
+      }
+    }
     ChangeThreshold -> input_datum.signatures == signatures
     _ -> False
   }
