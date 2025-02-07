@@ -13,14 +13,8 @@ pub fn valid_datum_recreation(
     get_inline_datum(output.datum)
 
   when redeemer.action is {
-    ChangeSignatures(new_signatures) -> and {
-        (new_signatures == signatures)?,
-        (input_datum.threshold_amount == threshold_amount)?,
-      }
-    ChangeThreshold(new_threshold_amount) -> and {
-        (input_datum.signatures == signatures)?,
-        (new_threshold_amount == threshold_amount)?,
-      }
+    ChangeSignatures -> input_datum.threshold_amount == threshold_amount
+    ChangeThreshold -> input_datum.signatures == signatures
     _ -> False
   }
 }

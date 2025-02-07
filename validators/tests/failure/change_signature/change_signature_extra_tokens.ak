@@ -103,7 +103,7 @@ test change_signatures_extra_tokens() fail {
           },
     }
 
-  let redeemer = MultisigRedeemer { action: ChangeSignatures(new_signatures) }
+  let redeemer = MultisigRedeemer { action: ChangeSignatures }
 
   palm_multisig_validator(
     multisig_singleton_name,

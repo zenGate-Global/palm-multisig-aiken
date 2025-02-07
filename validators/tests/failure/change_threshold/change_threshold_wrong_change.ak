@@ -7,7 +7,7 @@ use aiken/transaction/value.{add, from_lovelace, to_minted_value, zero}
 use palm_multisig/palm_multisig_validator.{palm_multisig_validator}
 use palm_multisig/tests/global_test_variables.{
   alice_address_hash, bob_address_hash, charlie_address_hash,
-  multisig_contract_hash, multisig_singleton_name, one_ada, owner_address_hash,
+  multisig_contract_hash, multisig_singleton_name, one_ada,
 }
 use palm_multisig/types.{ChangeSignatures, MultisigDatum, MultisigRedeemer}
 use sundae/multisig.{Signature}
@@ -20,14 +20,6 @@ test change_threshold_wrong_change() fail {
       Signature(alice_address_hash),
       Signature(bob_address_hash),
       Signature(charlie_address_hash),
-    ]
-
-  let new_signatures =
-    [
-      Signature(alice_address_hash),
-      Signature(bob_address_hash),
-      Signature(charlie_address_hash),
-      Signature(owner_address_hash),
     ]
 
   let multisig_input_datum =
@@ -101,7 +93,7 @@ test change_threshold_wrong_change() fail {
           },
     }
 
-  let redeemer = MultisigRedeemer { action: ChangeSignatures(new_signatures) }
+  let redeemer = MultisigRedeemer { action: ChangeSignatures }
 
   palm_multisig_validator(
     multisig_singleton_name,

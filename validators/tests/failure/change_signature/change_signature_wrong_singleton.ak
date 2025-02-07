@@ -102,7 +102,7 @@ test change_signatures_wrong_singleton() fail {
           },
     }
 
-  let redeemer = MultisigRedeemer { action: ChangeSignatures(new_signatures) }
+  let redeemer = MultisigRedeemer { action: ChangeSignatures }
 
   palm_multisig_validator(
     multisig_singleton_name,

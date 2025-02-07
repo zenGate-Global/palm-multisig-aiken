@@ -92,8 +92,7 @@ test change_threshold_1() {
           },
     }
 
-  let redeemer =
-    MultisigRedeemer { action: ChangeThreshold(new_threshold_amount) }
+  let redeemer = MultisigRedeemer { action: ChangeThreshold }
 
   palm_multisig_validator(
     multisig_singleton_name,

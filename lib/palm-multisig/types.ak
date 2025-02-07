@@ -2,8 +2,8 @@ use sundae/multisig.{MultisigScript}
 
 pub type Action {
   Genesis(Int, List<MultisigScript>)
-  ChangeSignatures(List<MultisigScript>)
-  ChangeThreshold(Int)
+  ChangeSignatures
+  ChangeThreshold
 }
 
 pub type MultisigDatum {
