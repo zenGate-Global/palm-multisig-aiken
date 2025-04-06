@@ -1,11 +1,8 @@
-use aiken/transaction.{
-  InlineDatum, Input, Mint, NoDatum, Output, OutputReference, ScriptContext,
-  Transaction, TransactionId,
+use cardano/address.{Address, Credential, Script}
+use cardano/assets.{add, from_lovelace, zero}
+use cardano/transaction.{
+  InlineDatum, Input, NoDatum, Output, OutputReference, Transaction,
 }
-use aiken/transaction/credential.{
-  Address, ScriptCredential, VerificationKeyCredential,
-}
-use aiken/transaction/value.{add, from_lovelace, to_minted_value, zero}
 use palm_multisig/palm_multisig_validator.{palm_multisig_mint_validator}
 use palm_multisig/tests/global_test_variables.{
   alice_address_hash, bob_address_hash, charlie_address_hash,
@@ -26,15 +23,13 @@ test create_genesis_wrong_threshold() fail {
 
   let owner_address =
     Address {
-      payment_credential: VerificationKeyCredential(owner_address_hash),
+      payment_credential: Credential.VerificationKey(owner_address_hash),
       stake_credential: None,
     }
 
   let owner_input_output_ref =
     OutputReference {
-      transaction_id: TransactionId(
-        #"dcb9788326b92481d5bb0e1de8d85ecfec619947880c43d422aa0a672c79dc2c",
-      ),
+      transaction_id: #"dcb9788326b92481d5bb0e1de8d85ecfec619947880c43d422aa0a672c79dc2c",
       output_index: 0,
     }
 
@@ -59,7 +54,7 @@ test create_genesis_wrong_threshold() fail {
   let multisig_output =
     Output {
       address: Address {
-        payment_credential: ScriptCredential(multisig_contract_hash),
+        payment_credential: Script(multisig_contract_hash),
         stake_credential: None,
       },
       value: from_lovelace(one_ada)
@@ -68,21 +63,17 @@ test create_genesis_wrong_threshold() fail {
       reference_script: None,
     }
 
-  let context =
-    ScriptContext {
-      purpose: Mint(multisig_contract_hash),
-      transaction: transaction.placeholder()
-        |> fn(transaction) {
-            Transaction {
-              ..transaction,
-              inputs: [owner_input],
-              outputs: [multisig_output],
-              mint: zero()
-                |> add(multisig_contract_hash, multisig_singleton_name, 1)
-                |> to_minted_value(),
-            }
-          },
-    }
+  let tx =
+    transaction.placeholder
+      |> fn(transaction) {
+          Transaction {
+            ..transaction,
+            inputs: [owner_input],
+            outputs: [multisig_output],
+            mint: zero
+              |> add(multisig_contract_hash, multisig_singleton_name, 1),
+          }
+        }
 
   let redeemer =
     MultisigRedeemer {
@@ -93,7 +84,8 @@ test create_genesis_wrong_threshold() fail {
   palm_multisig_mint_validator(
     multisig_singleton_name,
     redeemer,
-    context,
+    tx,
+    multisig_contract_hash,
     owner_input_output_ref,
   )
 }

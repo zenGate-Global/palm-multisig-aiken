@@ -1,9 +1,8 @@
-use aiken/transaction.{
-  InlineDatum, Input, Output, OutputReference, ScriptContext, Spend, Transaction,
-  TransactionId,
+use cardano/address.{Address, Script}
+use cardano/assets.{add, from_lovelace, zero}
+use cardano/transaction.{
+  InlineDatum, Input, Output, OutputReference, Transaction,
 }
-use aiken/transaction/credential.{Address, ScriptCredential}
-use aiken/transaction/value.{add, from_lovelace, to_minted_value, zero}
 use palm_multisig/palm_multisig_validator.{palm_multisig_validator}
 use palm_multisig/tests/global_test_variables.{
   alice_address_hash, bob_address_hash, charlie_address_hash,
@@ -33,7 +32,7 @@ test change_threshold_extra_tokens() fail {
   let multisig_input_utxo_details =
     Output {
       address: Address {
-        payment_credential: ScriptCredential(multisig_contract_hash),
+        payment_credential: Script(multisig_contract_hash),
         stake_credential: None,
       },
       value: from_lovelace(one_ada)
@@ -44,9 +43,7 @@ test change_threshold_extra_tokens() fail {
 
   let multisig_input_output_ref =
     OutputReference {
-      transaction_id: TransactionId(
-        #"dcb9788326b92481d5bb0e1de8d85ecfec619947880c43d422aa0a672c79dc2c",
-      ),
+      transaction_id: #"dcb9788326b92481d5bb0e1de8d85ecfec619947880c43d422aa0a672c79dc2c",
       output_index: 1,
     }
 
@@ -64,7 +61,7 @@ test change_threshold_extra_tokens() fail {
   let multisig_output =
     Output {
       address: Address {
-        payment_credential: ScriptCredential(multisig_contract_hash),
+        payment_credential: Script(multisig_contract_hash),
         stake_credential: None,
       },
       value: from_lovelace(one_ada)
@@ -74,25 +71,19 @@ test change_threshold_extra_tokens() fail {
       reference_script: None,
     }
 
-  let context =
-    ScriptContext {
-      purpose: Spend(multisig_input_output_ref),
-      transaction: transaction.placeholder()
-        |> fn(transaction) {
-            Transaction {
-              ..transaction,
-              inputs: [multisig_input],
-              outputs: [multisig_output],
-              extra_signatories: [
-                bob_address_hash,
-                charlie_address_hash,
-                alice_address_hash,
-              ],
-              mint: zero()
-                |> to_minted_value(),
-            }
-          },
-    }
+  let tx =
+    transaction.placeholder
+      |> fn(transaction) {
+          Transaction {
+            ..transaction,
+            inputs: [multisig_input],
+            outputs: [multisig_output],
+            extra_signatories: [
+              bob_address_hash, charlie_address_hash, alice_address_hash,
+            ],
+            mint: zero,
+          }
+        }
 
   let redeemer = MultisigRedeemer { action: ChangeThreshold }
 
@@ -100,6 +91,7 @@ test change_threshold_extra_tokens() fail {
     multisig_singleton_name,
     multisig_input_datum,
     redeemer,
-    context,
+    tx,
+    multisig_input.output_reference,
   )
 }

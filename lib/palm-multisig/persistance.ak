@@ -1,5 +1,5 @@
-use aiken/list
-use aiken/transaction.{Output}
+use aiken/collection/list
+use cardano/transaction.{Output}
 use palm_multisig/types.{
   ChangeSignatures, ChangeThreshold, MultisigDatum, MultisigRedeemer,
 }
