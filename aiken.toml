@@ -1,7 +1,7 @@
 name = "zengate/palm-multisig"
 version = "0.0.0"
-compiler = "v1.0.29-alpha"
-plutus = "v2"
+compiler = "v1.1.15"
+plutus = "v3"
 license = "Apache-2.0"
 description = "Aiken contracts for project 'zengate/palm-multisig'"
 
@@ -12,12 +12,11 @@ platform = "github"
 
 [[dependencies]]
 name = "aiken-lang/stdlib"
-version = "1.9.0"
+version = "2.2.0"
 source = "github"
 
 [[dependencies]]
 name = "sundaeswap-finance/aicone"
-version = "497e4dd59c1f1e02efacdee0c577ffcd030326bf"
+version = "main"
 source = "github"
-
 

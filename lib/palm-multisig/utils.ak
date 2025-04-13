@@ -1,6 +1,6 @@
-use aiken/list.{filter}
-use aiken/transaction.{Datum, InlineDatum, Output}
-use aiken/transaction/value.{AssetName, PolicyId, quantity_of}
+use aiken/collection/list.{filter}
+use cardano/assets.{AssetName, PolicyId, quantity_of}
+use cardano/transaction.{Datum, InlineDatum, Output}
 
 pub fn get_inline_datum(datum: Datum) -> Data {
   when datum is {
