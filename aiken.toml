@@ -1,5 +1,5 @@
 name = "zengate/palm-multisig"
-version = "0.0.0"
+version = "1.0.0"
 compiler = "v1.1.15"
 plutus = "v3"
 license = "Apache-2.0"
