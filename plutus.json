@@ -2,7 +2,7 @@
   "preamble": {
     "title": "zengate/palm-multisig",
     "description": "Aiken contracts for project 'zengate/palm-multisig'",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "plutusVersion": "v3",
     "compiler": {
       "name": "Aiken",
