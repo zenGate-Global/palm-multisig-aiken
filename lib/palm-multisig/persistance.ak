@@ -23,7 +23,16 @@ pub fn valid_datum_recreation(
         input_datum.threshold_amount == threshold_amount
       }
     }
-    ChangeThreshold -> input_datum.signatures == signatures
+    ChangeThreshold -> {
+      let signature_count = list.length(signatures)
+
+      if signature_count < threshold_amount {
+        fail @"threshold must be updated to a value at most as large as the number of signatures"
+      } else {
+        // sigs must not change, threshold can be any amount up to the signature count
+        input_datum.signatures == signatures
+      }
+    }
     _ -> False
   }
 }
